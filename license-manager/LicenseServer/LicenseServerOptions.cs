@@ -13,4 +13,8 @@ public class LicenseServerOptions
     public string ApiVersion { get; set; } = "1";
 
     public string CmsVersion { get; set; } = "2.0.7";
+
+    public string? UserStorePath { get; set; } = "../LicenseManager/users.json";
+
+    public string? AuditPath { get; set; } = "../LicenseManager/audit.log";
 }
