@@ -1,0 +1,48 @@
+[
+  {
+    "Id": "2d40c5c2-3a6f-4d0b-94ef-1a04d4b99188",
+    "Key": "IMPERIA-AAA111-BBB222",
+    "Email": "cliente@exemplo.com",
+    "Type": "Premium",
+    "Status": "Active",
+    "CreatedAt": "2024-01-15T12:00:00Z",
+    "ExpiresAt": "2025-01-15T12:00:00Z",
+    "Notes": "Licença padrão",
+    "Usages": {},
+    "CustomFields": {
+      "0": "srv-principal",
+      "1": "portal.exemplo.com",
+      "2": "192.168.0.10",
+      "4": "true",
+      "20": "premium"
+    }
+  },
+  {
+    "Id": "1c169978-3d02-4c33-9888-0cf3e4a2c7c4",
+    "Key": "IMPERIA-INATIVA-333",
+    "Email": "teste@exemplo.com",
+    "Type": "Silver",
+    "Status": "Inactive",
+    "CreatedAt": "2023-07-01T09:30:00Z",
+    "ExpiresAt": null,
+    "Notes": "Licença desativada manualmente",
+    "Usages": {},
+    "CustomFields": {
+      "20": "silver"
+    }
+  },
+  {
+    "Id": "9f0562fb-6fd1-43b0-a36a-2d139d3b15c1",
+    "Key": "IMPERIA-BAN-999",
+    "Email": "fraude@exemplo.com",
+    "Type": "PremiumPlus",
+    "Status": "Banned",
+    "CreatedAt": "2023-03-20T18:45:00Z",
+    "ExpiresAt": null,
+    "Notes": "Banida por uso indevido",
+    "Usages": {},
+    "CustomFields": {
+      "20": "premium+"
+    }
+  }
+]
