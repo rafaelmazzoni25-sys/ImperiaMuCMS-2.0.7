@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using LicenseManager.Models;
+using LicenseModel = LicenseManager.Models.License;
 using LicenseManager.Services;
 
 namespace LicenseManager;
@@ -11,13 +12,25 @@ namespace LicenseManager;
 public partial class MainForm : Form
 {
     private readonly LicenseRepository _repository = new();
-    private readonly BindingList<License> _licenses = new();
+    private readonly BindingList<LicenseModel> _licenses = new();
 
     public MainForm()
     {
         InitializeComponent();
         statusFilterComboBox.DataSource = Enum.GetValues(typeof(LicenseStatus));
         statusFilterComboBox.SelectedItem = LicenseStatus.Active;
+        typeFilterComboBox.Items.Clear();
+        typeFilterComboBox.Items.Add("Todos");
+        foreach (LicenseType licenseType in Enum.GetValues(typeof(LicenseType)))
+        {
+            typeFilterComboBox.Items.Add(licenseType);
+        }
+
+        if (typeFilterComboBox.Items.Count > 0)
+        {
+            typeFilterComboBox.SelectedIndex = 0;
+        }
+
         licensesDataGridView.AutoGenerateColumns = false;
     }
 
@@ -41,16 +54,19 @@ public partial class MainForm : Form
 
     private void ApplyFilter()
     {
+        IEnumerable<LicenseModel> filtered = _licenses;
+
         if (statusFilterComboBox.SelectedItem is LicenseStatus status)
         {
-            var filtered = _licenses.Where(l => l.Status == status).ToList();
-            licensesBindingSource.DataSource = new BindingList<License>(filtered);
-        }
-        else
-        {
-            licensesBindingSource.DataSource = _licenses;
+            filtered = filtered.Where(l => l.Status == status);
         }
 
+        if (typeFilterComboBox.SelectedItem is LicenseType licenseType)
+        {
+            filtered = filtered.Where(l => l.Type == licenseType);
+        }
+
+        licensesBindingSource.DataSource = new BindingList<LicenseModel>(filtered.ToList());
         licensesDataGridView.Refresh();
         UpdateStatusCounters();
     }
@@ -64,9 +80,9 @@ public partial class MainForm : Form
             $"Ativas: {totalActive}   Inativas: {totalInactive}   Banidas: {totalBanned}";
     }
 
-    private License? GetSelectedLicense()
+    private LicenseModel? GetSelectedLicense()
     {
-        if (licensesBindingSource.Current is License license)
+        if (licensesBindingSource.Current is LicenseModel license)
         {
             return license;
         }
@@ -121,6 +137,11 @@ public partial class MainForm : Form
     }
 
     private void OnStatusChanged(object sender, EventArgs e)
+    {
+        ApplyFilter();
+    }
+
+    private void OnTypeFilterChanged(object sender, EventArgs e)
     {
         ApplyFilter();
     }

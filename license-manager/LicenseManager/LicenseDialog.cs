@@ -12,6 +12,7 @@ public partial class LicenseDialog : Form
     {
         InitializeComponent();
         statusComboBox.DataSource = Enum.GetValues(typeof(LicenseStatus));
+        typeComboBox.DataSource = Enum.GetValues(typeof(LicenseType));
         License = new License();
         BindLicense();
     }
@@ -26,6 +27,7 @@ public partial class LicenseDialog : Form
     {
         keyTextBox.Text = License.Key;
         emailTextBox.Text = License.Email;
+        typeComboBox.SelectedItem = License.Type;
         statusComboBox.SelectedItem = License.Status;
         createdDateTimePicker.Value = License.CreatedAt.ToLocalTime();
         expiresCheckBox.Checked = License.ExpiresAt.HasValue;
@@ -56,6 +58,7 @@ public partial class LicenseDialog : Form
 
         License.Key = keyTextBox.Text.Trim();
         License.Email = emailTextBox.Text.Trim();
+        License.Type = (LicenseType)typeComboBox.SelectedItem!;
         License.Status = (LicenseStatus)statusComboBox.SelectedItem!;
         License.CreatedAt = DateTime.SpecifyKind(createdDateTimePicker.Value, DateTimeKind.Local).ToUniversalTime();
         License.ExpiresAt = expiresCheckBox.Checked
