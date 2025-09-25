@@ -1,0 +1,23 @@
+{
+    "licenses": [
+        {
+            "key": "SAMPLE-MAIN-LICENSE",
+            "email": "owner@example.com",
+            "status": "ACTIVE",
+            "purchase_name": "ImperiaMuCMS Premium",
+            "product": "premium",
+            "expires": 0,
+            "custom_fields": {
+                "0": "My MU Server",
+                "1": "owner@example.com",
+                "2": "https://mu.example.com",
+                "3": "127.0.0.1",
+                "4": "© 2024 My MU Server",
+                "5": "no",
+                "7": "no",
+                "20": "Season 18"
+            },
+            "usages": {}
+        }
+    ]
+}
