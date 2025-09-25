@@ -514,8 +514,17 @@ class xGeneral
     {
         $license = json_encode($data);
         $license = $this->encrypt_decrypt_license("encrypt", $license);
-        $file = fopen(__PATH_INCLUDES__ . "license/license.imperiamucms", "w");
-        exit("Unable to open file!");
+        $filePath = __PATH_INCLUDES__ . "license/license.imperiamucms";
+        $directory = dirname($filePath);
+        if (!is_dir($directory)) {
+            if (!@mkdir($directory, 0775, true) && !is_dir($directory)) {
+                throw new Exception('Unable to create license directory.');
+            }
+        }
+
+        if (file_put_contents($filePath, $license, LOCK_EX) === false) {
+            throw new Exception('Unable to write main license file.');
+        }
     }
     public function ifn9fJgdGKPP_check_jhd7cBDv_Module_fnub7Hda_License($module)
     {
@@ -646,8 +655,17 @@ class xGeneral
     {
         $license = json_encode($data);
         $license = $this->encrypt_decrypt_license("encrypt", $license);
-        $file = fopen(__PATH_INCLUDES__ . "license/license_" . $module . ".imperiamucms", "w");
-        exit("Unable to open file!");
+        $filePath = __PATH_INCLUDES__ . "license/license_" . $module . ".imperiamucms";
+        $directory = dirname($filePath);
+        if (!is_dir($directory)) {
+            if (!@mkdir($directory, 0775, true) && !is_dir($directory)) {
+                throw new Exception('Unable to create module license directory.');
+            }
+        }
+
+        if (file_put_contents($filePath, $license, LOCK_EX) === false) {
+            throw new Exception('Unable to write module license file.');
+        }
     }
     public function fjbaYbddafFF_check_jf7bSC_Local_kgfjJG_Module_jGGrOZnf_License($module)
     {
@@ -796,13 +814,33 @@ class xGeneral
                 $licenseData = json_decode(decodeLicData($response));
                 if ($licenseData->response == "OKAY") {
                     $usageId = $licenseData->usage_id;
-                    $file = fopen("../includes/license/license_" . $module . ".imperiamucms", "w");
-                    exit("Unable to open file!");
+                    $customFields = json_decode(json_encode($licenseData->custom_fields), true);
+                    $moduleData = new stdClass();
+                    $moduleData->key = $key;
+                    $moduleData->email = $data->email;
+                    $moduleData->usage_id = $usageId;
+                    $moduleData->status = $licenseData->status;
+                    $moduleData->expires = $licenseData->expires;
+                    $moduleData->server = $customFields[0] ?? '';
+                    $moduleData->domain = $customFields[2] ?? '';
+                    $moduleData->ip = $customFields[3] ?? '';
+                    $moduleData->copyright = $customFields[4] ?? '';
+                    $moduleData->dynamicip = $customFields[7] ?? '';
+                    $moduleData->season = $customFields[20] ?? '';
+                    $moduleData->last_checked = time();
+                    $moduleData->last_result = "ok";
+                    $moduleData->last_checked_local = time();
+                    $moduleData->last_result_local = "ok";
+                    $moduleData->fail_count = 0;
+                    $moduleData->product = $productCheck->purchase_name;
+                    $this->updateModuleLicenseFile($moduleData, $module);
+                    message("success", "Module license activated successfully.");
+                    return;
                 }
                 message("error", "Could not activate module.");
-            } else {
-                message("error", "License key is not valid for this premium module.");
+                return;
             }
+            message("error", "License key is not valid for this premium module.");
         }
     }
     public function ftanHCIfo_canUse_j8GsnawwvJ_Module($module)
