@@ -4,18 +4,23 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using LicenseManager.Models;
-using LicenseModel = LicenseManager.Models.License;
 using LicenseManager.Services;
+using LicenseModel = LicenseManager.Models.License;
 
 namespace LicenseManager;
 
 public partial class MainForm : Form
 {
-    private readonly LicenseRepository _repository = new();
+    private readonly LicenseRepository _repository;
+    private readonly AuditService _auditService;
+    private readonly User _currentUser;
     private readonly BindingList<LicenseModel> _licenses = new();
 
-    public MainForm()
+    public MainForm(LicenseRepository repository, AuditService auditService, User currentUser)
     {
+        _repository = repository;
+        _auditService = auditService;
+        _currentUser = currentUser;
         InitializeComponent();
         statusFilterComboBox.DataSource = Enum.GetValues(typeof(LicenseStatus));
         statusFilterComboBox.SelectedItem = LicenseStatus.Active;
@@ -32,6 +37,7 @@ public partial class MainForm : Form
         }
 
         licensesDataGridView.AutoGenerateColumns = false;
+        userStatusLabel.Text = $"Usuário: {_currentUser.Username}";
     }
 
     protected override void OnLoad(EventArgs e)
@@ -100,6 +106,8 @@ public partial class MainForm : Form
             var license = dialog.License;
             license.CreatedAt = DateTime.UtcNow;
             _repository.Upsert(license);
+            _auditService.Record("Criação de licença (desktop)", _currentUser.Username, license,
+                "Licença criada via gerenciador desktop.");
             ReloadData();
         }
     }
@@ -116,6 +124,8 @@ public partial class MainForm : Form
         if (dialog.ShowDialog(this) == DialogResult.OK)
         {
             _repository.Upsert(dialog.License);
+            _auditService.Record("Atualização de licença (desktop)", _currentUser.Username, dialog.License,
+                "Licença atualizada via gerenciador desktop.");
             ReloadData();
         }
     }
@@ -131,6 +141,8 @@ public partial class MainForm : Form
         if (MessageBox.Show($"Remover licença {license.Key}?", "Confirmar exclusão",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
         {
+            _auditService.Record("Exclusão de licença (desktop)", _currentUser.Username, license,
+                "Licença excluída via gerenciador desktop.");
             _repository.Delete(license.Id);
             ReloadData();
         }
@@ -167,6 +179,8 @@ public partial class MainForm : Form
 
         license.Status = status;
         _repository.Upsert(license);
+        _auditService.Record($"Alteração de status (desktop)", _currentUser.Username, license,
+            $"Status alterado para {status}.");
         ReloadData();
     }
 

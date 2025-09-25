@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -41,6 +42,8 @@ public class LicenseRepository
             Directory.CreateDirectory(directory);
         }
 
+        CreateBackupIfNeeded();
+
         using var stream = File.Create(_storagePath);
         JsonSerializer.Serialize(stream, licenses, _jsonOptions);
     }
@@ -68,10 +71,64 @@ public class LicenseRepository
         Save(licenses);
     }
 
+    public License? FindById(Guid id)
+    {
+        return Load().FirstOrDefault(l => l.Id == id);
+    }
+
     public License? FindByKeyAndEmail(string key, string email)
     {
         return Load().FirstOrDefault(license =>
             string.Equals(license.Key, key, StringComparison.OrdinalIgnoreCase) &&
             string.Equals(license.Email, email, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void CreateBackupIfNeeded()
+    {
+        if (!File.Exists(_storagePath))
+        {
+            return;
+        }
+
+        var directory = Path.GetDirectoryName(_storagePath);
+        if (string.IsNullOrEmpty(directory))
+        {
+            return;
+        }
+
+        var backupDirectory = Path.Combine(directory, "backups");
+        Directory.CreateDirectory(backupDirectory);
+
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture);
+        var fileName = Path.GetFileName(_storagePath);
+        var backupFile = Path.Combine(backupDirectory, $"{timestamp}-{fileName}");
+
+        File.Copy(_storagePath, backupFile, overwrite: true);
+
+        CleanupOldBackups(backupDirectory, fileName, 20);
+    }
+
+    private static void CleanupOldBackups(string backupDirectory, string originalFileName, int maxBackups)
+    {
+        if (!Directory.Exists(backupDirectory))
+        {
+            return;
+        }
+
+        var files = Directory.GetFiles(backupDirectory, $"*-{originalFileName}")
+            .OrderByDescending(File.GetCreationTimeUtc)
+            .ToList();
+
+        for (var index = maxBackups; index < files.Count; index++)
+        {
+            try
+            {
+                File.Delete(files[index]);
+            }
+            catch
+            {
+                // Ignore cleanup failures to avoid interrupting the save process.
+            }
+        }
     }
 }

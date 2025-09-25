@@ -25,6 +25,7 @@ partial class MainForm
     private DataGridView licensesDataGridView;
     private StatusStrip statusStrip;
     private ToolStripStatusLabel statusStripLabel;
+    private ToolStripStatusLabel userStatusLabel;
     private BindingSource licensesBindingSource;
     private DataGridViewTextBoxColumn keyColumn;
     private DataGridViewTextBoxColumn emailColumn;
@@ -62,6 +63,7 @@ partial class MainForm
         notesColumn = new DataGridViewTextBoxColumn();
         statusStrip = new StatusStrip();
         statusStripLabel = new ToolStripStatusLabel();
+        userStatusLabel = new ToolStripStatusLabel();
         layoutPanel.SuspendLayout();
         toolStrip.SuspendLayout();
         ((ISupportInitialize)licensesDataGridView).BeginInit();
@@ -255,7 +257,7 @@ partial class MainForm
         //
         // statusStrip
         //
-        statusStrip.Items.AddRange(new ToolStripItem[] { statusStripLabel });
+        statusStrip.Items.AddRange(new ToolStripItem[] { statusStripLabel, userStatusLabel });
         statusStrip.Location = new System.Drawing.Point(0, 560);
         statusStrip.Name = "statusStrip";
         statusStrip.Size = new System.Drawing.Size(960, 22);
@@ -264,7 +266,13 @@ partial class MainForm
         //
         // statusStripLabel
         //
+        statusStripLabel.Spring = true;
         statusStripLabel.Text = "Ativas: 0   Inativas: 0   Banidas: 0";
+        statusStripLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+        //
+        // userStatusLabel
+        //
+        userStatusLabel.Text = "Usuário:";
         //
         // MainForm
         //
