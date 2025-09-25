@@ -1,3 +1,4 @@
+
 # Ferramentas de Licenciamento do ImperiaMuCMS
 
 Este diretório reúne o gerenciador desktop em Windows Forms e o novo servidor de licenças escrito em C#, ambos compartilhando a mesma camada de modelos e persistência.
